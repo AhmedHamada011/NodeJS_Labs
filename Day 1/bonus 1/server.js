@@ -1,6 +1,6 @@
 
 var http = require("http");
-var port = "5000";
+var port = "7000";
 
 var httpServer = http.createServer((req,res)=>{
   var reqUrl = req.url;
