@@ -103,7 +103,9 @@ app.post("/profile.html",(req,res)=>{
   })
 });
 
-
+app.all("*",(req,res)=>{
+  res.send("Page Not Found");
+})
 
 app.listen(PORT,() =>{
   console.log(console.log("http://localhost:" + PORT ));
