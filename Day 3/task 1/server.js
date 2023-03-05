@@ -10,6 +10,8 @@ let PORT = process.env.PORT || "7000";
 let profileFileHTML = fs.readFileSync("Client/profile.html").toString();
 let jsonFile = "clients.json";
 
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 
 
 
@@ -47,60 +49,53 @@ app.get("/clients.json",(req,res)=>{
 });
 
 
-app.post("/profile.html",(req,res)=>{
+app.post("/profile.html",
 
-  req.on("data",(data)=>{
+//middleware
+(req,res,next) => {
 
-    const parsedData = new URLSearchParams(data.toString());
-    const dataObj = {};
+  name = req.body["name"];
+  email = req.body["email"];
+  mobile = req.body["mobile"];
+  address = req.body["address"];
 
-    for (var pair of parsedData.entries()) {
-      dataObj[pair[0]] = pair[1];
-    }
+  profileFileHTML = profileFileHTML.replace("{clientName}",name)
+  profileFileHTML = profileFileHTML.replace("{MobileNumber}",email);
+  profileFileHTML = profileFileHTML.replace("{Email}",mobile);
+  profileFileHTML = profileFileHTML.replace("{Address}",address);
 
-    name = dataObj["name"];
-    email = dataObj["email"];
-    mobile = dataObj["mobile"];
-    address = dataObj["address"];
+  let user = {
+    name,
+    email,
+    mobile,
+    address
+  }
 
-  });
+  let readJson = fs.readFileSync(jsonFile,"utf-8");
 
-  req.on("end",()=>{
+  let jsonArray = [];
+  
+  if(readJson === ""){
 
-    profileFileHTML = profileFileHTML.replace("{clientName}",name)
-    profileFileHTML = profileFileHTML.replace("{MobileNumber}",email);
-    profileFileHTML = profileFileHTML.replace("{Email}",mobile);
-    profileFileHTML = profileFileHTML.replace("{Address}",address);
+    jsonArray.push(user);
+    fs.appendFileSync(jsonFile,JSON.stringify(jsonArray));
 
+  }else{
 
-    let user = {
-      name,
-      email,
-      mobile,
-      address
-    }
+    let jsonArray = fs.readFileSync(jsonFile,"utf-8");
+    jsonArray = JSON.parse(jsonArray);
 
-    let readJson = fs.readFileSync(jsonFile,"utf-8");
+    jsonArray.push(user);
+    fs.writeFileSync(jsonFile,JSON.stringify(jsonArray))
+  }
 
-    let jsonArray = [];
-    if(readJson === ""){
+  next();
 
-      jsonArray.push(user);
-      fs.appendFileSync(jsonFile,JSON.stringify(jsonArray));
+},
+(req,res)=>{
+  
+  res.send(profileFileHTML);
 
-    }else{
-
-      let jsonArray = fs.readFileSync(jsonFile,"utf-8");
-      jsonArray = JSON.parse(jsonArray);
-
-      jsonArray.push(user);
-      fs.writeFileSync(jsonFile,JSON.stringify(jsonArray))
-
-    }
-
-    res.send(profileFileHTML);
-
-  })
 });
 
 app.all("*",(req,res)=>{
