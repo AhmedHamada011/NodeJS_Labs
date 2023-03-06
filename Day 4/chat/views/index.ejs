@@ -17,6 +17,10 @@
     .main-section{
       overflow-y: auto;
     }
+
+    .send{
+      text-align: right;
+    }
   </style>
   <title>Document</title>
 </head>
@@ -65,18 +69,27 @@
 
     send.addEventListener('click', function(e) {
     if (input.value) {
-      socket.emit('chat message', input.value);
+      socket.emit('send-message', input.value);
+      displayMsg(input.value,"send");
+
       input.value = '';
     }
   });
 
 
-  socket.on('message', function(msg) {
-    var item = document.createElement('p');
+  socket.on('receive-msg', function(msg) {
+    displayMsg(msg);
+    messagesSection.scrollTo(0,messagesSection.scrollHeight);
+  });
+
+  function displayMsg(msg, style=""){
+
+    let item = document.createElement('p');
+    if(style)
+      item.classList.add(style);
     item.innerHTML = `<span> ${msg} </span>`;
     messagesSection.appendChild(item);
-    messagesSection.scrollTo(0,messagesSection.scrollHeight)
-  });
+  }
 
   </script>
     

@@ -12,8 +12,9 @@ app.get('/', function(req, res) {
 
 
 io.on('connection', (socket) => {
-  socket.on('chat message', (msg) => {
-    io.emit("message",msg);
+
+  socket.on('send-message', (msg) => {
+    socket.broadcast.emit("receive-msg",msg);
   });
 
 });
