@@ -72,7 +72,7 @@
     var item = document.createElement('p');
     item.innerHTML = `<span> ${msg} </span>`;
     messagesSection.appendChild(item);
-    window.scrollTo(0, document.body.scrollHeight);
+    messagesSection.scrollTo(0,messagesSection.scrollHeight)
   });
 
 
